@@ -1,0 +1,47 @@
+﻿@model HomePageViewModel
+
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h1 class="text-center">Currently free Facilities as of today</h1>
+
+<hr />
+<div class="d-flex align-items-center mt-3">
+    <p class="mx-3 mb-0 h3">You can search all Facilities and make a reservation</p>
+    <form asp-controller="Facilitys" asp-action="Index" method="get">
+        <input type="submit" class="btn btn-primary" value="See All" />
+    </form>
+</div>
+<div class="my-4">
+   <!----<p>Prices starting from <strong>@Model.MinPrice$</strong> up to <strong>@Model.MaxPrice$</strong> / night</p>
+    <p>Total reservations made all-time: <strong>@Model.TotalReservationsMade</strong></p>
+    <p>Breakfast only for <strong>@Model.BreakfastPrice$</strong></p>
+    <p>All-inclusive only for <strong>@Model.AllInclusivePrice$</strong></p> -->
+</div>
+<br />
+
+<ul class="list-inline text-dark d-flex flex-wrap flex-column flex-md-row w-100">
+    @foreach (var FacilityCard in Model?.Facilitys.OrderBy(x => x.Number))
+    {
+        <li class="pb-3 col-md-6 col-12">
+            <a asp-controller="Facilitys" asp-action="Details" asp-route-id="@FacilityCard.Id"
+               class="content-heading clearfix media box-hover text-decoration-none border border-info rounded blue-card">
+                <div class="d-flex flex-md-row flex-column">
+                    <div class="col-md-6 col-12 align-items-center d-flex justify-content-center">
+                        <img src="@FacilityCard.ImageUrl" alt="Facility image" class="d-block w-100" />
+                    </div>
+                    <div class="m-5 ml-4 col-md-6 col-12">
+                        <h3 class="text-dark font-weight-bold">Facility №@FacilityCard.Number</h3>
+                        <p class="text-dark ">Capacity: @FacilityCard.Capacity</p>
+                        <p class="text-dark ">Facility type: @FacilityCard.Type</p>
+                        <p class="text-dark ">Children price: @FacilityCard.ChildrenPrice$</p>
+                        <p class="text-dark ">Adult price: @FacilityCard.AdultPrice$</p>
+                    </div>
+                </div>
+            </a>
+        </li>
+    }
+</ul>
+
+<partial name="_PaginationPartial" model="Model" />

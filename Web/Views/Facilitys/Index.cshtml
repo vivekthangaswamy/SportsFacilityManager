@@ -1,0 +1,106 @@
+﻿@model FacilityIndexViewModel
+
+@inject SignInManager<ApplicationUser> SignInManager
+@{
+    ViewData["Title"] = "All Facilities";
+}
+<h1 class="text-center">Facilities</h1>
+
+@if (SignInManager.Context.User.IsInRole("Admin"))
+{
+    <form asp-controller="Facilitys" asp-action="Create" method="get">
+        <input class="btn btn-info" type="submit" value="Add Facility" />
+    </form>
+}
+<hr />
+
+<form method="get" class="d-flex justify-content-around align-items-center col-md-12 col-12 flex-column flex-md-row">
+    <div class="form-group">
+        <label class="control-label">Facility types</label>
+        <select multiple name="type" asp-items="Model.GetTypesSelectList()" data-size="10" style="height:130px!important;" class=" overflow-hidden form-control"></select>
+    </div>
+    <div class="form-group">
+        <label class="control-label">Minimum Facility capacity</label>
+        <select name="minCapacity" asp-items="Model.GetCapacitySelectList()" class="form-control"></select>
+    </div>
+    <div class="form-group">
+        <div class="checkbox">
+            <label>
+                @{
+                    string check = "";
+                    if (Model.AvailableOnly)
+                    {
+                        check = "checked";
+                    }
+                    <input name="availableOnly" type="checkbox" value="true" @check /> <span>Free at present</span>
+                }
+            </label>
+        </div>
+    </div>
+    <div class="form-group">
+        <input type="submit" value="Search" class="btn btn-primary" />
+    </div>
+</form>
+<br />
+<br />
+
+<div>
+    <!-- <p>Breakfast only for <strong>@Model.BreakfastPrice$</strong></p>
+    <p>All-inclusive only for <strong>@Model.AllInclusivePrice$</strong></p> -->
+</div>
+<br />
+<br />
+
+@if (Model?.Facilitys?.Any() ?? false)
+{
+    <ul class="list-inline text-dark">
+
+        @foreach (var Facility in Model.Facilitys.OrderBy(x => x.Number))
+        {
+        <li class="pb-3 list-inline">
+            <a asp-action="Details" asp-controller="Facilitys" asp-route-id="@Facility.Id" class="text-decoration-none">
+                <div class="d-flex border border-info rounded blue-card justify-content-between list-inline text-dark flex-wrap flex-column flex-md-row w-100">
+                    <div class="col-md-3 col-12 align-items-center d-flex justify-content-center">
+                        <img src="@Facility.ImageUrl" alt="Facility image" class="d-block w-100" />
+                    </div>
+                    <div class="my-5 col-md-6 col-12">
+                        <h3 class="text-dark font-weight-bold">Number: @Facility.Number</h3>
+                        <h5 class="text-dark ">Type: @Facility.Type.ToString()</h5>
+                        <h5 class="text-dark ">
+                            Capacity: @Facility.Capacity
+                        </h5>
+                        <p class="text-dark mb-0">Adult price: @Facility.AdultPrice$</p>
+                        <p class="text-dark ">Children price: @Facility.ChildrenPrice$</p>
+
+                    </div>
+                    <div class="col-md-3 col-12 justify-content-around align-self-center d-flex flex-row flex-md-column">
+                        <form asp-controller="Facilitys" asp-action="Details" asp-route-id="@Facility.Id" method="get" class="my-2">
+                            <input class="btn btn-info " type="submit" value="Info" />
+                        </form>
+                        <form asp-controller="Reservations" asp-action="Create" asp-route-id="@Facility.Id" method="get" class="my-2">
+                            <input class="btn btn-success" type="submit" value="Reserve" />
+                        </form>
+                        @if (SignInManager.Context.User.IsInRole("Admin"))
+                        {
+                            <form asp-controller="Facilitys" asp-action="Update" asp-route-id="@Facility.Id" method="get" class="my-2">
+                                <input class="btn btn-primary" type="submit" value="Change" />
+                            </form>
+                            <form asp-controller="Facilitys" asp-action="Delete" asp-route-id="@Facility.Id" class="my-2"
+                                  method="post">
+                                <input class="btn btn-danger" type="submit" onclick="return confirm('Are you sure you want to delete?')" value="Delete" />
+                            </form>
+                        }
+                    </div>
+
+                </div>
+            </a>
+        </li>
+        }
+    </ul>
+}
+else
+{
+<h1>No Facilities match the search criteria</h1>
+}
+
+<partial name="_PaginationPartial" model="Model" />
